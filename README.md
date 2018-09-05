@@ -1,0 +1,1 @@
+dynamic-pure-react-carousel
