@@ -2,7 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 
 const config = {
-  entry: "./src/index.js",
+  entry: "./src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js"
@@ -12,7 +12,23 @@ const config = {
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: ["babel-loader", "ts-loader"]
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                [
+                  "@babel/preset-env",
+                  {
+                    useBuiltIns: "entry",
+                    targets: "> 5%, not dead"
+                  }
+                ]
+              ]
+            }
+          },
+          "ts-loader"
+        ]
       },
       {
         test: /\.scss$/,
@@ -21,10 +37,11 @@ const config = {
     ]
   },
   resolve: {
-    extensions: [".js", ".jsx"]
+    extensions: [".tsx", ".ts", ".js"]
   },
   devServer: {
-    contentBase: "./dist"
+    historyApiFallback: true,
+    contentBase: path.join(__dirname, "dist")
   }
 };
 
