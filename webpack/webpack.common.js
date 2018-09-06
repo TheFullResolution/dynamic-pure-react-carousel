@@ -1,6 +1,8 @@
 const webpack = require('webpack')
 const path = require('path')
 const autoprefixer = require('autoprefixer')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const config = {
     entry: './src/index.tsx',
@@ -39,7 +41,6 @@ const config = {
                         loader: 'css-loader',
                         options: {
                             modules: true,
-                            localIdentName: '[path]-[name]-[local]--[hash:base64:5]'
                         },
                     },
                     {
@@ -49,9 +50,8 @@ const config = {
                             plugins: () => [
                                 autoprefixer({
                                     browsers: [
-                                        '>1%',
+                                        '>5%',
                                         'last 4 versions',
-                                        'Firefox ESR',
                                         'not ie < 11',
                                     ],
                                 }),
@@ -63,6 +63,10 @@ const config = {
             },
         ],
     },
+    plugins: [
+        new CleanWebpackPlugin(['dist']),
+        new HtmlWebpackPlugin({ template: './assets/index.html' }),
+    ],
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
