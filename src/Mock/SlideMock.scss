@@ -1,0 +1,29 @@
+.slides_container {
+  display: flex;
+  padding: 10px;
+}
+
+.slides_wrapper {
+  border: solid 1px rgb(198, 198, 198);
+  padding: 10px;
+}
+
+.slides_heading {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+
+  img {
+    margin-right: 10px;
+    width: 40px;
+  }
+}
+
+.slides_big_image {
+  height: 110px;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}

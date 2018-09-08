@@ -1,4 +1,92 @@
+body {
+  font-family: sans-serif;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+:focus:not(.focus-visible) {
+  outline-width: 0;
+}
 
 .root {
-  color: aqua;
+  max-width: 900px;
+  margin: {
+    left: auto;
+    right: auto;
+  }
+  padding: {
+    left: 3%;
+    right: 3%;
+  }
+}
+
+.carousel_container {
+  display: flex;
+  width: 100%;
+}
+
+.carousel_slider_container {
+  flex: auto;
+}
+
+.carousel_slide {
+  div:not(.focus-ring),
+  li:not(.focus-ring) {
+    outline-width: 0;
+  }
+}
+
+.carousel_control_button {
+  background-color: transparent;
+  border: none;
+  flex: none;
+  font-size: 18px;
+  padding: 10px;
+
+  @supports (position: sticky) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+
+    span {
+      position: sticky;
+      top: 200px;
+      padding: {top: 18px};
+    }
+  }
+}
+
+.carousel_dot_group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 10px;
+
+  button {
+    background-color: rgb(198, 198, 198);
+    border: none;
+    border-radius: 100%;
+    flex: none;
+    font-size: 18px;
+    margin-right: 10px;
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  :global {
+    .carousel__dot--selected {
+      background-color: rgb(88, 84, 84);
+    }
+  }
 }
