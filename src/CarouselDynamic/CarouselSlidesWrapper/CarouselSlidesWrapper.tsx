@@ -15,88 +15,61 @@ export interface Props {
   readonly slides: ReactElement<{}>[]
   readonly children: (params: RenderProps) => ReactNode
   readonly slideClassName?: string
-  readonly width: number
   readonly visibleSlides?: number
 }
 
 interface State {
   readonly assignedRefs: boolean
   readonly slidesLength: number
-  readonly getWidthState: number
   readonly naturalSlideHeight: number
   readonly naturalSlideWidth: number
-  readonly visibleSlides: number
 }
 
 export class CarouselSlidesWrapper extends Component<Props, State> {
   public readonly state = {
     assignedRefs: false,
-    slidesLength: this.props.slides.length,
-    getWidthState: this.props.width,
     naturalSlideHeight: 600,
-    naturalSlideWidth: this.props.width,
-    visibleSlides: this.props.visibleSlides ? this.props.visibleSlides : 1,
+    slidesLength: this.props.slides.length,
+    naturalSlideWidth: 600,
   }
 
   protected slideBiggestDivRef!: HTMLDivElement
   protected slideDivRefs: HTMLDivElement[] = []
   protected slideDivRefsFiltered: HTMLDivElement[] = []
-  private timeout: any // tslint:disable-line: no-any
 
-  public componentWillUnmount() {
-    clearTimeout(this.timeout)
-  }
   public componentDidMount() {
     this.onMountCall()
   }
 
   public componentDidUpdate(prevProps: Props, prevState: State) {
-    // To prevent using setTimeout or other weird hacks I leverage component lifecycle.
-    // Update (re-render) is the trigger on prop change or state, however,
-    // any calculations related to manipulation of a height of slides is being
-    // triggered only by state changes. If prop changes I either remove min-height,
-    // so components will redraw or trigger state change to delay recalculation one update.
-    // Then only after state changes, I trigger recalculations of slides heights.
     if (
-      (prevProps.slides.length !== this.props.slides.length &&
-        this.props.slides.length > 0) ||
-      prevProps.visibleSlides !== this.props.visibleSlides
+      prevProps.slides.length !== this.props.slides.length &&
+      this.props.slides.length > 0
     ) {
       this.cleanMinHeight()
+
+      this.updateStateForNewRefs()
     }
 
     if (prevState.slidesLength !== this.state.slidesLength) {
       this.assignDivRefs()
     }
 
-    if (prevProps.width !== this.props.width) this.updateWidthState()
-
-    if (prevState.getWidthState !== this.state.getWidthState) {
+    if (
+      this.state.assignedRefs &&
+      (this.slideBiggestDivRef.clientHeight !== this.state.naturalSlideHeight ||
+        this.slideBiggestDivRef.clientWidth !== this.state.naturalSlideWidth)
+    ) {
       this.setNaturalDimensions()
-    }
-
-    if (
-      prevState.assignedRefs !== this.state.assignedRefs &&
-      prevState.assignedRefs === false
-    ) {
-      return this.setNaturalDimensions()
-    }
-
-    if (
-      prevState.naturalSlideHeight !== this.state.naturalSlideHeight ||
-      prevState.naturalSlideWidth !== this.state.naturalSlideWidth
-    ) {
-      this.adjustMinHeight()
     }
   }
 
   public render() {
-    console.log(this.slideBiggestDivRef && this.slideBiggestDivRef)
     return this.props.children({
       naturalSlideHeight: this.state.naturalSlideHeight,
       naturalSlideWidth: this.state.naturalSlideWidth,
       slides: this.renderDataWithRef(),
-      visibleSlides: this.state.visibleSlides,
+      visibleSlides: this.props.visibleSlides ? this.props.visibleSlides : 1,
     })
   }
 
@@ -126,24 +99,17 @@ export class CarouselSlidesWrapper extends Component<Props, State> {
     this.slideDivRefs.forEach((element) => {
       element.style.minHeight = '0px'
     })
-    this.updateStateForRender()
+  }
+
+  private readonly updateStateForNewRefs = () => {
+    this.setState(() => ({
+      assignedRefs: false,
+      slidesLength: this.props.slides.length,
+    }))
   }
 
   private readonly onMountCall = () => {
-    this.timeout = setTimeout(() => {
-      this.assignDivRefs()
-    })
-  }
-
-  private readonly updateWidthState = () => {
-    this.setState(() => ({ getWidthState: this.props.width }))
-  }
-
-  private readonly updateStateForRender = () => {
-    this.setState(() => ({
-      slidesLength: this.props.slides.length,
-      visibleSlides: this.props.visibleSlides ? this.props.visibleSlides : 1,
-    }))
+    this.assignDivRefs()
   }
 
   private readonly assignDivRefs = () => {
@@ -158,15 +124,15 @@ export class CarouselSlidesWrapper extends Component<Props, State> {
   }
 
   private readonly setNaturalDimensions = () => {
-    if (
-      this.slideBiggestDivRef.clientHeight !== this.state.naturalSlideHeight ||
-      this.slideBiggestDivRef.clientWidth !== this.state.naturalSlideWidth
-    ) {
-      this.setState(() => ({
+    this.setState(
+      () => ({
         naturalSlideHeight: this.slideBiggestDivRef.clientHeight,
         naturalSlideWidth: this.slideBiggestDivRef.clientWidth,
-      }))
-    }
+      }),
+      () => {
+        this.adjustMinHeight()
+      }
+    )
   }
 
   private readonly adjustMinHeight = () => {

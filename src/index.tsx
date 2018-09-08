@@ -30,7 +30,6 @@ const Root: SFC = () => {
         {({ width }) => (
           <CarouselSlidesWrapper
             slides={slidesArray}
-            width={width}
             visibleSlides={width > 850 ? 3 : width > 480 ? 2 : 1}
           >
             {({ naturalSlideHeight, naturalSlideWidth, slides, visibleSlides }) => (
