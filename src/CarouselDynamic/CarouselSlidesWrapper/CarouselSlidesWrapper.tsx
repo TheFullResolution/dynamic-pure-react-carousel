@@ -9,6 +9,7 @@ interface RenderProps {
   naturalSlideWidth: number
   visibleSlides: number
   slides: ReactElement<{}>[]
+  assignedRefs: boolean
 }
 
 export interface Props {
@@ -56,9 +57,12 @@ export class CarouselSlidesWrapper extends Component<Props, State> {
     }
 
     if (
-      this.state.assignedRefs &&
-      (this.slideBiggestDivRef.clientHeight !== this.state.naturalSlideHeight ||
-        this.slideBiggestDivRef.clientWidth !== this.state.naturalSlideWidth)
+      (prevState.assignedRefs !== this.state.assignedRefs &&
+        prevState.assignedRefs === false) ||
+      (this.state.assignedRefs &&
+        (this.slideBiggestDivRef.clientHeight !==
+          this.state.naturalSlideHeight ||
+          this.slideBiggestDivRef.clientWidth !== this.state.naturalSlideWidth))
     ) {
       this.setNaturalDimensions()
     }
@@ -66,6 +70,7 @@ export class CarouselSlidesWrapper extends Component<Props, State> {
 
   public render() {
     return this.props.children({
+      assignedRefs:  this.state.assignedRefs,
       naturalSlideHeight: this.state.naturalSlideHeight,
       naturalSlideWidth: this.state.naturalSlideWidth,
       slides: this.renderDataWithRef(),
